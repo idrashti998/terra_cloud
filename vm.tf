@@ -1,26 +1,19 @@
-terraform {
-  required_providers {
-    aws = {
-      source = "hashicorp/aws"
-      version = "6.7.0"
-    }
+resource "azurerm_resource_group" "terra_example" {
+  name     = "azure_resourcesg"
+  location = "West Europe"
+}
+
+resource "azurerm_public_ip" "terra_pubip" {
+  name                = "my_pip"
+  resource_group_name = azurerm_resource_group.terra_example.name
+  location            = azurerm_resource_group.terra_example.location
+  allocation_method   = "Static"
+
+  tags = {
+    environment = "Production"
+  }
+
+  provisioner "local-exec" {
+    command = "echo ${self.ip_address} > public_ips.txt"
   }
 }
-
-variable "region_name" {
-   default = "us-west-2"
-}
-
-provider "aws" {
-  region     = var.region_name
-}
-
-resource "aws_instance" "demo" {
-  ami                         = "ami-04e08e36e17a21b56" 
-  instance_type               = "t2.micro"
-  key_name                    = "oregan"
-  tags = { 
-    Name = "EC2-web" 
-    }
-}
-
